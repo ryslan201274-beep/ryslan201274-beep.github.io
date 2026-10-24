@@ -1,902 +1,204 @@
-```html
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Citadel Builder | City OS Tycoon</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700&display=swap');
-
-        :root {
-            --neon-green: #00ff66;
-            --neon-cyan: #00f3ff;
-            --neon-gold: #ffb703;
-            --neon-alert: #ff0055;
-            --dark-core: #050b11;
-        }
-
-        body {
-            background-color: var(--dark-core);
-            color: #d1d5db;
-            font-family: 'Inter', sans-serif;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-            overflow-x: hidden;
-        }
-
-        .mono {
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        .heading-font {
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        /* Сканувальна лінія Цитаделі */
-        .scanline {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 255, 102, 0.03) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-            background-size: 100% 4px, 6px 100%;
-            pointer-events: none;
-            z-index: 99;
-        }
-
-        /* Неонове світіння */
-        .glow-green {
-            box-shadow: 0 0 15px rgba(0, 255, 102, 0.35);
-        }
-        .glow-cyan {
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.35);
-        }
-        .glow-gold {
-            box-shadow: 0 0 15px rgba(255, 183, 3, 0.35);
-        }
-        .glow-alert {
-            box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
-        }
-
-        /* Анімація кліків */
-        .click-floater {
-            position: absolute;
-            pointer-events: none;
-            font-family: 'Share Tech Mono', monospace;
-            font-weight: bold;
-            font-size: 18px;
-            animation: floatUp 0.85s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-            z-index: 100;
-        }
-
-        @keyframes floatUp {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(0.9);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-55px) scale(1.3);
-            }
-        }
-
-        /* Кастомний скрол */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(5, 11, 17, 0.8);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #00ff6644;
-            border-radius: 4px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Citadel Builder | City OS Tycoon</title>
+  <style>
+    :root {
+      --bg-dark: #070d18;
+      --card-bg: #0d1726;
+      --border-color: #1e2d42;
+      --accent-neon: #00ffcc;
+      --accent-blue: #38bdf8;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 12px;
+      background-color: var(--bg-dark);
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Courier New", monospace;
+      font-size: 14px;
+      user-select: none;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 12px;
+    }
+    .badge {
+      background: rgba(0, 255, 204, 0.1);
+      color: var(--accent-neon);
+      border: 1px solid var(--accent-neon);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .grid-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .stat-val {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--accent-blue);
+    }
+    .stat-sub {
+      font-size: 10px;
+      color: var(--accent-neon);
+      margin-top: 2px;
+    }
+    .core-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .citadel-core {
+      width: 110px;
+      height: 110px;
+      margin: 10px auto;
+      background: radial-gradient(circle, #00ffcc 10%, #0284c7 60%, transparent 80%);
+      border-radius: 50%;
+      box-shadow: 0 0 25px rgba(0, 255, 204, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #070d18;
+      font-weight: bold;
+      font-size: 12px;
+      transition: transform 0.05s ease;
+    }
+    .citadel-core:active {
+      transform: scale(0.92);
+      box-shadow: 0 0 35px rgba(0, 255, 204, 0.8);
+    }
+    .action-btn {
+      width: 100%;
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .action-btn:active { background: #0369a1; }
+    .action-btn.neon {
+      background: var(--accent-neon);
+      color: #070d18;
+    }
+    .action-btn.neon:active { background: #00ccaa; }
+    .btn-disabled { opacity: 0.5; pointer-events: none; }
+    .logs-panel {
+      background: #040810;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px;
+      height: 130px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+    }
+    .log-line { margin: 3px 0; color: var(--text-muted); }
+    .log-neon { color: var(--accent-neon); }
+    .log-amber { color: var(--accent-amber); }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-black">
-    <div class="scanline"></div>
+<body>
 
-    <!-- ВЕРХНЯ ТЕЛЕМЕТРІЯ (HUD) -->
-    <header class="w-full bg-[#08121e]/90 border-b border-emerald-500/30 backdrop-blur-md sticky top-0 z-50 px-3 py-2.5 shadow-lg">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
-            <!-- Бренд & Статус -->
-            <div class="flex items-center justify-between w-full md:w-auto">
-                <div class="flex items-center gap-2">
-                    <div class="relative flex h-3 w-3">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                    </div>
-                    <span class="heading-font text-emerald-400 font-black tracking-wider text-sm sm:text-base">KOSOVCHYCH // CITY OS</span>
-                    <span class="text-[10px] bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.5 rounded mono">TIER IV+</span>
-                </div>
-                <button id="soundToggleBtn" class="text-xs mono border border-cyan-500/40 text-cyan-400 px-2 py-1 rounded hover:bg-cyan-950/40 transition">
-                    ЗВУК: УВІМК
-                </button>
-            </div>
-
-            <!-- Ресурсний дисплей -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full md:w-auto text-xs mono">
-                <!-- Баланс / EUR -->
-                <div class="bg-black/60 border border-emerald-500/40 p-2 rounded-lg flex flex-col">
-                    <span class="text-gray-400 text-[10px] uppercase">Капітал (€)</span>
-                    <span id="statFund" class="text-emerald-400 font-bold text-sm truncate">€0.00</span>
-                    <span id="statFundRate" class="text-[9px] text-emerald-500/80">+€0.00/с</span>
-                </div>
-                <!-- Хешрейт -->
-                <div class="bg-black/60 border border-cyan-500/40 p-2 rounded-lg flex flex-col">
-                    <span class="text-gray-400 text-[10px] uppercase">Обчислення</span>
-                    <span id="statHashrate" class="text-cyan-400 font-bold text-sm truncate">0.0 GH/s</span>
-                    <span class="text-[9px] text-cyan-400/80">ОМЕГА V3</span>
-                </div>
-                <!-- Енергія -->
-                <div class="bg-black/60 border border-amber-500/40 p-2 rounded-lg flex flex-col">
-                    <span class="text-gray-400 text-[10px] uppercase">Енергобуфер (H2/LiFe)</span>
-                    <span id="statEnergy" class="text-amber-400 font-bold text-sm truncate">100 / 100 kW</span>
-                    <span id="statEnergyNet" class="text-[9px] text-amber-500/80">+0 kW/с</span>
-                </div>
-                <!-- Термодинаміка Core -->
-                <div class="bg-black/60 border border-rose-500/40 p-2 rounded-lg flex flex-col relative overflow-hidden">
-                    <div id="tempGlowBg" class="absolute inset-0 bg-rose-500/10 transition-colors"></div>
-                    <span class="text-gray-400 text-[10px] uppercase relative">Ядро / AQUA-LOOP</span>
-                    <span id="statTemp" class="text-rose-400 font-bold text-sm relative">63.5 °C</span>
-                    <span id="statThermalEfficiency" class="text-[9px] text-rose-300 relative">100% рекуперація</span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- ГОЛОВНА АРЕНА (ІЗОМЕТРИЧНЕ МІСТО ТА СЕРВЕРНИЙ ЦЕНТР) -->
-    <main class="max-w-6xl w-full mx-auto p-3 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        
-        <!-- ЛІВА КОЛОНКА: ВІЗУАЛІЗАЦІЯ ЦИТАДЕЛІ ТА КЛІКЕР (7 колонок) -->
-        <div class="lg:col-span-7 flex flex-col gap-3">
-            
-            <!-- Полотно 2.5D Цитаделі -->
-            <div class="relative bg-gradient-to-b from-[#091522] to-[#04080e] border border-emerald-500/30 rounded-2xl p-2 overflow-hidden shadow-2xl">
-                <!-- Індикатор сповіщення / Радар -->
-                <div class="absolute top-3 left-3 z-20 flex items-center gap-2 bg-black/70 border border-emerald-500/40 px-2.5 py-1 rounded-full text-xs mono">
-                    <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                    <span id="citadelFloorStatus">РІВЕНЬ ЦИТАДЕЛІ: 1 (ФУНДАМЕНТ)</span>
-                </div>
-
-                <div class="absolute top-3 right-3 z-20 flex items-center gap-2">
-                    <button id="emergencyCoolBtn" class="bg-rose-900/60 border border-rose-500/60 text-rose-300 text-xs px-2.5 py-1 rounded-lg mono hover:bg-rose-800 transition active:scale-95 hidden">
-                        ❄️ AQUA-DUMP
-                    </button>
-                </div>
-
-                <!-- Canvas Воксельної Вежі -->
-                <canvas id="citadelCanvas" class="w-full h-[280px] sm:h-[340px] block rounded-xl cursor-pointer"></canvas>
-
-                <!-- Інтерактивна плашка під полотном -->
-                <div class="p-3 bg-black/70 border-t border-emerald-500/20 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs mono">
-                    <div class="text-gray-400 text-center sm:text-left">
-                        Тисни на <span class="text-emerald-400 font-bold">Ядро Цитаделі</span> або кнопку для ручного синтезу енергії та обчислень
-                    </div>
-                    <button id="coreClickBtn" class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-black font-extrabold rounded-xl hover:from-emerald-400 hover:to-teal-500 active:scale-95 transition-all glow-green heading-font tracking-wide">
-                        ⚡ СИНТЕЗУВАТИ
-                    </button>
-                </div>
-            </div>
-
-            <!-- ТАКТИЧНИЙ ЖУРНАЛ СИСТЕМИ (ОМЕГА ЛОГ) -->
-            <div class="bg-[#060e17] border border-cyan-500/30 rounded-xl p-3 flex flex-col gap-1.5 h-36 overflow-hidden">
-                <div class="flex items-center justify-between border-b border-cyan-500/20 pb-1 text-xs mono text-cyan-400 font-bold">
-                    <span>📡 ТЕРМІНАЛ ШІ «ОМЕГА» // СИСТЕМНІ ЛОГИ</span>
-                    <span class="text-[10px] text-gray-500">LIVE FEED</span>
-                </div>
-                <div id="terminalLogs" class="flex-1 overflow-y-auto mono text-[11px] space-y-1 text-gray-300">
-                    <p class="text-emerald-400">[00:00:00] Ініціалізація ядра Kosovchych Citadel OS v1.0...</p>
-                    <p class="text-cyan-400">[00:00:01] Вузли Росток & Ванкувер підключено. Термодинаміка стабільна (+63.5°C).</p>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ПРАВА КОЛОНКА: АПГРЕЙДИ МОДУЛІВ ЦИТАДЕЛІ (5 колонок) -->
-        <div class="lg:col-span-5 flex flex-col gap-3">
-            <div class="bg-[#08121d] border border-emerald-500/30 rounded-2xl p-3.5 flex flex-col gap-3">
-                <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2">
-                    <h2 class="heading-font text-emerald-400 text-sm font-black tracking-wide">ІНЖЕНЕРНІ МОДУЛІ БУДІВНИЦТВА</h2>
-                    <span class="text-[10px] mono text-gray-400">TIER IV+ TECH</span>
-                </div>
-
-                <!-- Список модулів -->
-                <div class="space-y-2.5 max-h-[480px] overflow-y-auto pr-1" id="modulesList">
-                    
-                    <!-- 1. ASIC Підвал -->
-                    <div class="bg-black/50 border border-emerald-500/30 hover:border-emerald-500/70 p-3 rounded-xl flex items-center justify-between gap-2 transition" id="mod-card-miners">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-lg">⛏️</span>
-                                <h3 class="text-xs font-bold text-emerald-300">Підвал / ASIC-Стійки</h3>
-                                <span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 mono" id="lvl-miners">Lvl 1</span>
-                            </div>
-                            <p class="text-[10px] text-gray-400 mt-0.5">+15 GH/s, збільшує прибуток та нагрів</p>
-                            <div class="text-[10px] text-emerald-400/90 mono mt-1">Витрата: 2.2 kW/с</div>
-                        </div>
-                        <button class="buy-module-btn px-3 py-2 bg-emerald-500/20 border border-emerald-500/60 text-emerald-400 rounded-lg text-xs mono font-bold hover:bg-emerald-500/40 active:scale-95 transition" data-mod="miners">
-                            €<span id="cost-miners">25.00</span>
-                        </button>
-                    </div>
-
-                    <!-- 2. AQUA-LOOP Охолодження -->
-                    <div class="bg-black/50 border border-cyan-500/30 hover:border-cyan-500/70 p-3 rounded-xl flex items-center justify-between gap-2 transition" id="mod-card-cooling">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-lg">🌊</span>
-                                <h3 class="text-xs font-bold text-cyan-300">AQUA-LOOP Рекуперація</h3>
-                                <span class="text-[10px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-400 mono" id="lvl-cooling">Lvl 1</span>
-                            </div>
-                            <p class="text-[10px] text-gray-400 mt-0.5">Охолоджує ядро, продає тепло в басейни (+€/с)</p>
-                            <div class="text-[10px] text-cyan-400/90 mono mt-1">Ефективність: +1.8 °C/с зливу</div>
-                        </div>
-                        <button class="buy-module-btn px-3 py-2 bg-cyan-500/20 border border-cyan-500/60 text-cyan-400 rounded-lg text-xs mono font-bold hover:bg-cyan-500/40 active:scale-95 transition" data-mod="cooling">
-                            €<span id="cost-cooling">40.00</span>
-                        </button>
-                    </div>
-
-                    <!-- 3. Сонячні дахові панелі та ВЕС -->
-                    <div class="bg-black/50 border border-amber-500/30 hover:border-amber-500/70 p-3 rounded-xl flex items-center justify-between gap-2 transition" id="mod-card-energy">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-lg">☀️</span>
-                                <h3 class="text-xs font-bold text-amber-300">Дахові PV-панелі & ВЕС</h3>
-                                <span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-950 text-amber-400 mono" id="lvl-energy">Lvl 1</span>
-                            </div>
-                            <p class="text-[10px] text-gray-400 mt-0.5">+10 kW/с генерації чистої енергії</p>
-                            <div class="text-[10px] text-amber-400/90 mono mt-1">Знижує ризик дефіциту живлення</div>
-                        </div>
-                        <button class="buy-module-btn px-3 py-2 bg-amber-500/20 border border-amber-500/60 text-amber-400 rounded-lg text-xs mono font-bold hover:bg-amber-500/40 active:scale-95 transition" data-mod="energy">
-                            €<span id="cost-energy">30.00</span>
-                        </button>
-                    </div>
-
-                    <!-- 4. H2 Водневий Буфер & LiFePO4 -->
-                    <div class="bg-black/50 border border-indigo-500/30 hover:border-indigo-500/70 p-3 rounded-xl flex items-center justify-between gap-2 transition" id="mod-card-storage">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-lg">🔋</span>
-                                <h3 class="text-xs font-bold text-indigo-300">H2 Резерв & LiFePO4 2.5MWh</h3>
-                                <span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-400 mono" id="lvl-storage">Lvl 0</span>
-                            </div>
-                            <p class="text-[10px] text-gray-400 mt-0.5">+500 kW максимальної місткості мережі</p>
-                            <div class="text-[10px] text-indigo-400/90 mono mt-1">Стійкість до блекаутів</div>
-                        </div>
-                        <button class="buy-module-btn px-3 py-2 bg-indigo-500/20 border border-indigo-500/60 text-indigo-400 rounded-lg text-xs mono font-bold hover:bg-indigo-500/40 active:scale-95 transition" data-mod="storage">
-                            €<span id="cost-storage">85.00</span>
-                        </button>
-                    </div>
-
-                    <!-- 5. Охорона: Sea Baby & Дрони -->
-                    <div class="bg-black/50 border border-rose-500/30 hover:border-rose-500/70 p-3 rounded-xl flex items-center justify-between gap-2 transition" id="mod-card-defense">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-lg">🛡️</span>
-                                <h3 class="text-xs font-bold text-rose-300">Sea Baby Flotilla & Swarm</h3>
-                                <span class="text-[10px] px-1.5 py-0.2 rounded bg-rose-950 text-rose-400 mono" id="lvl-defense">Lvl 0</span>
-                            </div>
-                            <p class="text-[10px] text-gray-400 mt-0.5">Відбиває кібератаки, приносить бонуси</p>
-                            <div class="text-[10px] text-rose-400/90 mono mt-1">Захист периметра Балтики/Річок</div>
-                        </div>
-                        <button class="buy-module-btn px-3 py-2 bg-rose-500/20 border border-rose-500/60 text-rose-400 rounded-lg text-xs mono font-bold hover:bg-rose-500/40 active:scale-95 transition" data-mod="defense">
-                            €<span id="cost-defense">150.00</span>
-                        </button>
-                    </div>
-
-                </div>
-
-                <!-- Кнопки керування даними -->
-                <div class="pt-2 border-t border-emerald-500/20 flex items-center justify-between text-xs mono">
-                    <button id="saveGameBtn" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-1">
-                        💾 <span>ЗБЕРЕГТИ</span>
-                    </button>
-                    <button id="resetGameBtn" class="text-gray-500 hover:text-rose-400 transition">
-                        Скинути прогрес
-                    </button>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- ПІДВАЛ З ПАТЕНТНИМ СТАТУСОМ -->
-    <footer class="w-full bg-[#050b12] border-t border-emerald-500/20 py-2 px-4 text-center text-[10px] mono text-gray-500">
-        KOSOVCHYCH STRATEGY © 2026 | INTELLECTUAL PROPERTY VALUATION: €5,000,000 | TIER IV+ AUTONOMOUS CITY OS
-    </footer>
-
-    <!-- МОДАЛЬНЕ ВІКНО КІБЕРАТАКИ / ВИПАДКОВОЇ ПОДІЇ -->
-    <div id="eventModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
-        <div class="max-w-md w-full bg-[#0b1622] border-2 border-rose-500 rounded-2xl p-5 shadow-2xl flex flex-col gap-3 glow-alert">
-            <div class="flex items-center gap-2 text-rose-400">
-                <span class="text-2xl animate-bounce">⚠️</span>
-                <h3 class="heading-font font-bold text-base tracking-wide" id="modalEventTitle">ТРИВОГА: КІБЕРАТАКА НА ВУЗОЛ</h3>
-            </div>
-            <p class="text-xs text-gray-300 leading-relaxed" id="modalEventDesc">
-                Зовнішні хакери намагаються зламати крипто-ключі фонду. Дрони Sea Baby готові контратакувати!
-            </p>
-            <div class="flex items-center justify-end gap-2 pt-2">
-                <button id="modalActionBtn" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs mono active:scale-95 transition glow-alert">
-                    ВІДБИТИ АТАКУ
-                </button>
-            </div>
-        </div>
+  <header>
+    <div>
+      <span style="font-weight: bold; color: var(--accent-blue);">KOSOVCHYCH // CITY OS</span>
     </div>
-
-    <!-- JAVASCRIPT: ДВИГУН ГРИ, СИНТЕЗАТОР ЗВУКУ, CANVAS RENDERER -->
-    <script>
-        /* ============================================================
-           1. АУДІОСИСТЕМА (Web Audio API - жодних зовнішніх файлів)
-           ============================================================ */
-        class SoundEngine {
-            constructor() {
-                this.ctx = null;
-                this.enabled = true;
-            }
-
-            init() {
-                if (!this.ctx) {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AudioContext();
-                }
-            }
-
-            playBeep(freq = 600, type = 'sine', duration = 0.08, vol = 0.1) {
-                if (!this.enabled) return;
-                try {
-                    this.init();
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = type;
-                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start();
-                    osc.stop(this.ctx.currentTime + duration);
-                } catch(e) {}
-            }
-
-            clickSound() {
-                this.playBeep(880, 'square', 0.05, 0.07);
-            }
-
-            buySound() {
-                this.playBeep(523.25, 'triangle', 0.08, 0.1);
-                setTimeout(() => this.playBeep(659.25, 'triangle', 0.08, 0.1), 60);
-                setTimeout(() => this.playBeep(1046.50, 'sine', 0.15, 0.12), 120);
-            }
-
-            alertSound() {
-                this.playBeep(300, 'sawtooth', 0.2, 0.15);
-                setTimeout(() => this.playBeep(250, 'sawtooth', 0.2, 0.15), 180);
-            }
-
-            coolSound() {
-                this.playBeep(1200, 'sine', 0.15, 0.08);
-                setTimeout(() => this.playBeep(600, 'sine', 0.2, 0.08), 80);
-            }
-        }
-
-        const sound = new SoundEngine();
-
-        /* ============================================================
-           2. СТАН ТА ЕКОНОМІЧНА МОДЕЛЬ CITY OS
-           ============================================================ */
-        const GameState = {
-            fund: 15.0,              // Баланс у EUR
-            energy: 100.0,           // Поточна енергія (kW)
-            maxEnergy: 100.0,        // Макс. ємність буфера (kW)
-            hashrate: 10.0,          // GH/s
-            temp: 63.5,              // Температура ядра (°C)
-            targetTemp: 63.5,        // Ідеальна температура контуру
-            totalClicks: 0,
-            floorsUnlocked: 1,
-
-            // Модулі розбудови
-            modules: {
-                miners: { lvl: 1, baseCost: 25.0, costMult: 1.25, hashAdd: 18.0, powerUsage: 2.2, heatAdd: 0.28 },
-                cooling: { lvl: 1, baseCost: 40.0, costMult: 1.28, coolRate: 0.35, heatBonusEur: 0.6 },
-                energy: { lvl: 1, baseCost: 30.0, costMult: 1.22, genRate: 10.0 },
-                storage: { lvl: 0, baseCost: 85.0, costMult: 1.35, capAdd: 500.0 },
-                defense: { lvl: 0, baseCost: 150.0, costMult: 1.45, defenseRate: 0.15, bonusMult: 1.2 }
-            },
-
-            lastTick: Date.now()
-        };
-
-        /* ============================================================
-           3. CANVAS РЕНДЕРЕР: ВОКСЕЛЬНА 2.5D ЦИТАДЕЛЬ ТА АНІМАЦІЇ
-           ============================================================ */
-        const canvas = document.getElementById('citadelCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight - 60;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Додавання частинок при кліку
-        function spawnSparks(x, y, color = '#00ff66') {
-            for (let i = 0; i < 12; i++) {
-                particles.push({
-                    x: x,
-                    y: y,
-                    vx: (Math.random() - 0.5) * 6,
-                    vy: (Math.random() - 0.5) * 6 - 2,
-                    color: color,
-                    alpha: 1.0,
-                    size: Math.random() * 4 + 2
-                });
-            }
-        }
-
-        // Рендеринг ізометричного блоку поверху
-        function drawIsometricCube(cx, cy, sizeX, sizeY, sizeZ, topColor, leftColor, rightColor) {
-            // Верхня грань
-            ctx.beginPath();
-            ctx.moveTo(cx, cy - sizeZ);
-            ctx.lineTo(cx + sizeX, cy - sizeZ + sizeY * 0.5);
-            ctx.lineTo(cx, cy - sizeZ + sizeY);
-            ctx.lineTo(cx - sizeX, cy - sizeZ + sizeY * 0.5);
-            ctx.closePath();
-            ctx.fillStyle = topColor;
-            ctx.fill();
-            ctx.strokeStyle = '#00ff6633';
-            ctx.stroke();
-
-            // Ліва грань
-            ctx.beginPath();
-            ctx.moveTo(cx - sizeX, cy - sizeZ + sizeY * 0.5);
-            ctx.lineTo(cx, cy - sizeZ + sizeY);
-            ctx.lineTo(cx, cy + sizeY);
-            ctx.lineTo(cx - sizeX, cy + sizeY * 0.5);
-            ctx.closePath();
-            ctx.fillStyle = leftColor;
-            ctx.fill();
-
-            // Права грань
-            ctx.beginPath();
-            ctx.moveTo(cx, cy - sizeZ + sizeY);
-            ctx.lineTo(cx + sizeX, cy - sizeZ + sizeY * 0.5);
-            ctx.lineTo(cx + sizeX, cy + sizeY * 0.5);
-            ctx.lineTo(cx, cy + sizeY);
-            ctx.closePath();
-            ctx.fillStyle = rightColor;
-            ctx.fill();
-        }
-
-        // Анімаційний цикл Canvas
-        let animOffset = 0;
-        function renderCitadelScene() {
-            animOffset += 0.03;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const centerX = canvas.width / 2;
-            const baseY = canvas.height * 0.78;
-
-            // Фонова сітка матриці
-            ctx.strokeStyle = 'rgba(0, 255, 102, 0.06)';
-            ctx.lineWidth = 1;
-            const gridSpacing = 28;
-            for (let x = 0; x < canvas.width; x += gridSpacing) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
-
-            // Малювання поверхів Цитаделі (Вокселі)
-            const floors = Math.min(8, 1 + Math.floor(
-                (GameState.modules.miners.lvl + GameState.modules.cooling.lvl + GameState.modules.energy.lvl) / 3
-            ));
-            GameState.floorsUnlocked = floors;
-
-            for (let f = 0; f < floors; f++) {
-                const floorY = baseY - f * 34;
-                const scale = 1 - f * 0.04;
-                const pulse = Math.sin(animOffset + f * 0.5) * 2;
-
-                const topC = f === 0 ? '#0f2b1d' : (f === floors - 1 ? '#00f3ff' : '#0a1d30');
-                const leftC = f === 0 ? '#06160e' : '#05111c';
-                const rightC = f === 0 ? '#0b1f15' : '#081726';
-
-                drawIsometricCube(
-                    centerX, 
-                    floorY + pulse, 
-                    75 * scale, 
-                    50 * scale, 
-                    28, 
-                    topC, 
-                    leftC, 
-                    rightC
-                );
-
-                // Візуальні неони та сервери на поверсі
-                ctx.fillStyle = (f % 2 === 0) ? '#00ff66' : '#00f3ff';
-                ctx.shadowColor = ctx.fillStyle;
-                ctx.shadowBlur = 8;
-                ctx.fillRect(centerX - 15 * scale, floorY - 5 + pulse, 4, 4);
-                ctx.fillRect(centerX + 12 * scale, floorY - 5 + pulse, 4, 4);
-                ctx.shadowBlur = 0;
-            }
-
-            // Шпіль Цитаделі / Дрон Sea Baby захисту
-            if (GameState.modules.defense.lvl > 0) {
-                const droneX = centerX + Math.cos(animOffset * 1.5) * 90;
-                const droneY = (baseY - floors * 34) + Math.sin(animOffset * 2) * 20;
-                
-                // Візуалізація дрона патруля
-                ctx.fillStyle = '#ff0055';
-                ctx.shadowColor = '#ff0055';
-                ctx.shadowBlur = 10;
-                ctx.beginPath();
-                ctx.arc(droneX, droneY, 5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                ctx.strokeStyle = '#ff005544';
-                ctx.beginPath();
-                ctx.moveTo(droneX, droneY);
-                ctx.lineTo(centerX, baseY - floors * 34);
-                ctx.stroke();
-            }
-
-            // Оновлення та рендеринг іскор/частинок
-            for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.15; // гравітація
-                p.alpha -= 0.025;
-
-                ctx.fillStyle = p.color;
-                ctx.globalAlpha = Math.max(0, p.alpha);
-                ctx.fillRect(p.x, p.y, p.size, p.size);
-                ctx.globalAlpha = 1.0;
-
-                if (p.alpha <= 0) particles.splice(i, 1);
-            }
-
-            requestAnimationFrame(renderCitadelScene);
-        }
-
-        /* ============================================================
-           4. ТАКТИЧНИЙ ЖУРНАЛ (Логи Термінала)
-           ============================================================ */
-        const terminalLogs = document.getElementById('terminalLogs');
-        function addLog(message, type = 'info') {
-            const now = new Date();
-            const timeStr = `[${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}]`;
-            
-            let colorClass = 'text-gray-300';
-            if (type === 'success') colorClass = 'text-emerald-400';
-            if (type === 'warn') colorClass = 'text-amber-400';
-            if (type === 'alert') colorClass = 'text-rose-400';
-            if (type === 'cyan') colorClass = 'text-cyan-400';
-
-            const logLine = document.createElement('p');
-            logLine.className = colorClass;
-            logLine.textContent = `${timeStr} ${message}`;
-            terminalLogs.appendChild(logLine);
-            terminalLogs.scrollTop = terminalLogs.scrollHeight;
-        }
-
-        /* ============================================================
-           5. ІНТЕРАКТИВ КЛІКЕРА ТА ПЛАВАЮЧИЙ ТЕКСТ
-           ============================================================ */
-        function triggerCoreClick(event) {
-            sound.clickSound();
-            GameState.totalClicks++;
-
-            // Ефект при кліку: +Енергія, +€, сплеск
-            const clickEur = 0.5 + (GameState.hashrate * 0.005);
-            GameState.fund += clickEur;
-            GameState.energy = Math.min(GameState.maxEnergy, GameState.energy + 2.5);
-
-            // Локація кліку для анімації
-            const rect = canvas.getBoundingClientRect();
-            let x = event ? (event.clientX || (event.touches && event.touches[0].clientX)) : (rect.left + rect.width / 2);
-            let y = event ? (event.clientY || (event.touches && event.touches[0].clientY)) : (rect.top + rect.height / 2);
-
-            spawnSparks(x - rect.left, y - rect.top, '#00ff66');
-
-            // Плаваючий текст +€
-            const floater = document.createElement('div');
-            floater.className = 'click-floater text-emerald-400';
-            floater.textContent = `+€${clickEur.toFixed(2)}`;
-            floater.style.left = `${x}px`;
-            floater.style.top = `${y - 20}px`;
-            document.body.appendChild(floater);
-            setTimeout(() => floater.remove(), 850);
-
-            updateHUD();
-        }
-
-        document.getElementById('coreClickBtn').addEventListener('click', (e) => triggerCoreClick(e));
-        canvas.addEventListener('click', (e) => triggerCoreClick(e));
-
-        /* ============================================================
-           6. ГОЛОВНИЙ ТАЙКУН-ЦИКЛ (СИМУЛЯТОР ФІЗИКИ ТА РЕСУРСІВ)
-           ============================================================ */
-        function gameLoop() {
-            const now = Date.now();
-            const dt = (now - GameState.lastTick) / 1000.0;
-            GameState.lastTick = now;
-
-            // 1. Розрахунок енергетики
-            const energyGen = GameState.modules.energy.lvl * 10.0;
-            const energyConsumption = GameState.modules.miners.lvl * GameState.modules.miners.powerUsage;
-            const netEnergy = energyGen - energyConsumption;
-
-            GameState.energy += netEnergy * dt;
-            if (GameState.energy > GameState.maxEnergy) GameState.energy = GameState.maxEnergy;
-            if (GameState.energy < 0) {
-                GameState.energy = 0;
-                // Блекаут: без енергії сервери тимчасово не приносять прибуток
-            }
-
-            const hasPower = GameState.energy > 0;
-
-            // 2. Розрахунок Хешрейту та Доходу
-            GameState.hashrate = GameState.modules.miners.lvl * GameState.modules.miners.hashAdd;
-            
-            // Якщо є енергія — йде генерація євро
-            const eurPerSecMiners = hasPower ? (GameState.hashrate * 0.08) : 0;
-            
-            // Тепловий бонус AQUA-LOOP (продаж вторинного тепла в Росток/басейни)
-            const heatRevenue = GameState.modules.cooling.lvl * GameState.modules.cooling.heatBonusEur;
-            
-            const totalEurPerSec = eurPerSecMiners + heatRevenue;
-            GameState.fund += totalEurPerSec * dt;
-
-            // 3. Термодинаміка Ядра (Баланс нагріву стійок і відведення AQUA-LOOP)
-            const heatGen = GameState.modules.miners.lvl * GameState.modules.miners.heatAdd;
-            const heatDissipation = GameState.modules.cooling.lvl * GameState.modules.cooling.coolRate;
-            
-            // Наближення до робочої точки 63.5 °C
-            if (hasPower) {
-                GameState.temp += (heatGen - heatDissipation) * dt * 0.8;
-            } else {
-                // Охолодження при простої
-                GameState.temp = Math.max(22.0, GameState.temp - 1.2 * dt);
-            }
-
-            // Автоматичний скид або попередження про перегрів
-            const emergencyBtn = document.getElementById('emergencyCoolBtn');
-            if (GameState.temp > 75.0) {
-                emergencyBtn.classList.remove('hidden');
-                document.getElementById('tempGlowBg').className = 'absolute inset-0 bg-rose-600/30 animate-pulse';
-            } else {
-                emergencyBtn.classList.add('hidden');
-                document.getElementById('tempGlowBg').className = 'absolute inset-0 bg-rose-500/10';
-            }
-
-            updateHUD(totalEurPerSec, netEnergy);
-            checkRandomEvents();
-        }
-
-        // Аварійний скид тепла
-        document.getElementById('emergencyCoolBtn').addEventListener('click', () => {
-            sound.coolSound();
-            GameState.temp = 63.5;
-            addLog('AQUA-LOOP: Виконано аварійний скид тепла в буфер. Температура стабілізована.', 'cyan');
-        });
-
-        /* ============================================================
-           7. ОНОВЛЕННЯ HUD ТА ІНТЕРФЕЙСУ
-           ============================================================ */
-        function updateHUD(fundRate = 0, netEnergy = 0) {
-            document.getElementById('statFund').textContent = `€${GameState.fund.toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('statFundRate').textContent = `+€${fundRate.toFixed(2)}/с`;
-
-            // Форматування хешрейту
-            if (GameState.hashrate >= 1000) {
-                document.getElementById('statHashrate').textContent = `${(GameState.hashrate / 1000).toFixed(2)} TH/s`;
-            } else {
-                document.getElementById('statHashrate').textContent = `${GameState.hashrate.toFixed(1)} GH/s`;
-            }
-
-            document.getElementById('statEnergy').textContent = `${Math.floor(GameState.energy)} / ${GameState.maxEnergy} kW`;
-            document.getElementById('statEnergyNet').textContent = `${netEnergy >= 0 ? '+' : ''}${netEnergy.toFixed(1)} kW/с`;
-
-            const tempEl = document.getElementById('statTemp');
-            tempEl.textContent = `${GameState.temp.toFixed(1)} °C`;
-            if (GameState.temp > 75) {
-                tempEl.className = 'text-rose-400 font-bold text-sm relative animate-pulse';
-            } else if (GameState.temp < 50) {
-                tempEl.className = 'text-cyan-400 font-bold text-sm relative';
-            } else {
-                tempEl.className = 'text-emerald-400 font-bold text-sm relative';
-            }
-
-            document.getElementById('citadelFloorStatus').textContent = `РІВЕНЬ ЦИТАДЕЛІ: ${GameState.floorsUnlocked} (${GameState.floorsUnlocked * 3} СЕРВЕРНИХ СТІЙОК)`;
-
-            // Оновлення кнопок апгрейду
-            for (let key in GameState.modules) {
-                const mod = GameState.modules[key];
-                const cost = mod.baseCost * Math.pow(mod.costMult, mod.lvl);
-                
-                const costEl = document.getElementById(`cost-${key}`);
-                const lvlEl = document.getElementById(`lvl-${key}`);
-                const btn = document.querySelector(`.buy-module-btn[data-mod="${key}"]`);
-
-                if (costEl) costEl.textContent = cost.toFixed(2);
-                if (lvlEl) lvlEl.textContent = `Lvl ${mod.lvl}`;
-
-                if (btn) {
-                    if (GameState.fund >= cost) {
-                        btn.classList.remove('opacity-40', 'cursor-not-allowed');
-                        btn.classList.add('hover:bg-emerald-500/40');
-                    } else {
-                        btn.classList.add('opacity-40', 'cursor-not-allowed');
-                        btn.classList.remove('hover:bg-emerald-500/40');
-                    }
-                }
-            }
-        }
-
-        /* ============================================================
-           8. КУПІВЛЯ МОДУЛІВ ТА АПГРЕЙД ЦИТАДЕЛІ
-           ============================================================ */
-        document.querySelectorAll('.buy-module-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const modKey = btn.getAttribute('data-mod');
-                const mod = GameState.modules[modKey];
-                const cost = mod.baseCost * Math.pow(mod.costMult, mod.lvl);
-
-                if (GameState.fund >= cost) {
-                    GameState.fund -= cost;
-                    mod.lvl++;
-                    sound.buySound();
-
-                    if (modKey === 'storage') {
-                        GameState.maxEnergy += mod.capAdd;
-                    }
-
-                    addLog(`Модуль [${modKey.toUpperCase()}] покращено до Lvl ${mod.lvl}. Цитадель масштабується!`, 'success');
-                    saveGame();
-                    updateHUD();
-                } else {
-                    sound.playBeep(200, 'sawtooth', 0.1, 0.08);
-                    addLog('Недостатньо євро у фонді для модернізації.', 'warn');
-                }
-            });
-        });
-
-        /* ============================================================
-           9. ВИПАДКОВІ ПОДІЇ ТА ОБОРОНА SEA BABY
-           ============================================================ */
-        let lastEventCheck = Date.now();
-        function checkRandomEvents() {
-            if (Date.now() - lastEventCheck < 25000) return; // перевірка кожні 25 секунд
-            lastEventCheck = Date.now();
-
-            if (Math.random() < 0.35) {
-                triggerCyberEvent();
-            }
-        }
-
-        const modal = document.getElementById('eventModal');
-        const modalTitle = document.getElementById('modalEventTitle');
-        const modalDesc = document.getElementById('modalEventDesc');
-        const modalBtn = document.getElementById('modalActionBtn');
-
-        function triggerCyberEvent() {
-            sound.alertSound();
-            const events = [
-                {
-                    title: '⚠️ КІБЕРАТАКА: ВУЗОЛ РОСТОК',
-                    desc: 'Невідомий ботнет атакує шлюзи QKD. Дрони Sea Baby готові запустити протокол протидії.',
-                    reward: 45.0,
-                    btnText: 'ЗАПУСТИТИ SEA BABY'
-                },
-                {
-                    title: '⚡ ПІКОВИЙ ПОПИТ НА ЕНЕРГІЮ В МІСТІ',
-                    desc: 'Муніципальна мережа викуповує надлишкове тепло від серверів за потрійним тарифом!',
-                    reward: 65.0,
-                    btnText: 'ПРОДАТИ ТЕПЛО'
-                },
-                {
-                    title: '🛰️ СИНХРОНІЗАЦІЯ ВАНКУВЕР (SMART TWIN)',
-                    desc: 'Мережевий міст успішно передав блок обчислень. Отримано кешбек за трансконтинентальну оптимізацію.',
-                    reward: 90.0,
-                    btnText: 'ПРИЙНЯТИ ДИВІДЕНДИ'
-                }
-            ];
-
-            const ev = events[Math.floor(Math.random() * events.length)];
-            modalTitle.textContent = ev.title;
-            modalDesc.textContent = ev.desc;
-            modalBtn.textContent = ev.btnText;
-            modal.classList.remove('hidden');
-
-            modalBtn.onclick = () => {
-                sound.buySound();
-                GameState.fund += ev.reward;
-                addLog(`Подію успішно вирішено. Отримано бонус: +€${ev.reward.toFixed(2)}`, 'cyan');
-                modal.classList.add('hidden');
-                updateHUD();
-            };
-        }
-
-        /* ============================================================
-           10. ЗБЕРЕЖЕННЯ / ВІДНОВЛЕННЯ ДАНИХ (LocalStorage)
-           ============================================================ */
-        function saveGame() {
-            try {
-                localStorage.setItem('citadel_city_os_save', JSON.stringify({
-                    fund: GameState.fund,
-                    energy: GameState.energy,
-                    maxEnergy: GameState.maxEnergy,
-                    modules: GameState.modules,
-                    temp: GameState.temp,
-                    totalClicks: GameState.totalClicks
-                }));
-            } catch(e) {}
-        }
-
-        function loadGame() {
-            try {
-                const data = localStorage.getItem('citadel_city_os_save');
-                if (data) {
-                    const parsed = JSON.parse(data);
-                    GameState.fund = parsed.fund || 15.0;
-                    GameState.energy = parsed.energy || 100.0;
-                    GameState.maxEnergy = parsed.maxEnergy || 100.0;
-                    GameState.temp = parsed.temp || 63.5;
-                    GameState.totalClicks = parsed.totalClicks || 0;
-                    if (parsed.modules) {
-                        for (let k in parsed.modules) {
-                            if (GameState.modules[k]) {
-                                GameState.modules[k].lvl = parsed.modules[k].lvl;
-                            }
-                        }
-                    }
-                    addLog('Прогрес Цитаделі успішно завантажено з пам’яті ядра.', 'success');
-                }
-            } catch(e) {}
-        }
-
-        document.getElementById('saveGameBtn').addEventListener('click', () => {
-            saveGame();
-            sound.playBeep(900, 'sine', 0.08, 0.1);
-            addLog('Системні параметри записано в захищений сектор пам’яті.', 'success');
-        });
-
-        document.getElementById('resetGameBtn').addEventListener('click', () => {
-            if (confirm('Скинути прогрес Цитаделі до заводських параметрів Tier IV+?')) {
-                localStorage.removeItem('citadel_city_os_save');
-                location.reload();
-            }
-        });
-
-        // Керування звуком
-        const soundBtn = document.getElementById('soundToggleBtn');
-        soundBtn.addEventListener('click', () => {
-            sound.enabled = !sound.enabled;
-            soundBtn.textContent = `ЗВУК: ${sound.enabled ? 'УВІМК' : 'ВИМК'}`;
-            soundBtn.className = sound.enabled 
-                ? 'text-xs mono border border-cyan-500/40 text-cyan-400 px-2 py-1 rounded hover:bg-cyan-950/40 transition'
-                : 'text-xs mono border border-gray-600 text-gray-500 px-2 py-1 rounded transition';
-        });
-
-        /* ============================================================
-           11. СТАРТ СИСТЕМИ
-           ============================================================ */
-        window.onload = function () {
-            loadGame();
-            updateHUD();
-            renderCitadelScene();
-            setInterval(gameLoop, 100);     // 10 тиків на секунду
-            setInterval(saveGame, 10000);   // Автозбереження кожні 10 сек
-        };
-    </script>
-</body>
-</html>
-```
+    <span class="badge">TIER IV+</span>
+  </header>
+
+  <div class="grid-stats">
+    <div class="stat-card">
+      <div class="stat-label">Капітал (€)</div>
+      <div class="stat-val" id="capital">€171,767.00</div>
+      <div class="stat-sub" id="capital-rate">+€1.50/с</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Обчислення</div>
+      <div class="stat-val" id="hashrate">14.5 PH/s</div>
+      <div class="stat-sub">Омега Ядро V2</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Енергобуфер (H2)</div>
+      <div class="stat-val" id="energy">85 / 100 kW</div>
+      <div class="stat-sub" id="energy-rate">+2.0 kW/с</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ядро / Aqua-Loop</div>
+      <div class="stat-val" id="temp">+63.5 °C</div>
+      <div class="stat-sub">100% Рекуперація</div>
+    </div>
+  </div>
+
+  <div class="core-panel">
+    <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+      Рівень Цитаделі: <span id="citadel-lvl" style="color: var(--accent-blue); font-weight: bold;">1</span> 
+      (<span id="racks">200</span> Стійок)
+    </div>
+    
+    <div class="citadel-core" id="core-btn">
+      СИНТЕЗ
+    </div>
+    <div style="font-size: 11px; color: var(--text-muted);">Тисни на ядро для ручної генерації енергії та капіталу</div>
+  </div>
+
+  <button class="action-btn neon" id="btn-upgrade">
+    Розширити вузли (+10 стійок, +1.0 PH/s) — €250.00
+  </button>
+  <button class="action-btn" id="btn-cool">
+    Оптимізувати Aqua-Loop (Охолодження) — €100.00
+  </button>
+
+  <div style="margin: 12px 0 6px 0; font-size: 11px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">
+    Термінал «Омега» // Логи системи:
+  </div>
+  <div class="logs-panel" id="logs">
+    <div class="log-line log-neon">[00:00:00] Ініціалізація ядра Kosovchych Citadel OS v2.0...</div>
+    <div class="log-line">[00:00:01] Вузли Росток & Ванкувер підключено. Термодинаміка стабільна (+63.5°C).</div>
+  </div>
+
+  <script>
+    let capital = 171767.0;
+    let hashrate = 14.5;
+    let energy = 85.0;
+    let maxEnergy = 100.0;
+    let temp = 63.5;
+    let level = 1;
+    let racks = 20
